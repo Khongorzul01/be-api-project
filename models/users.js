@@ -20,11 +20,10 @@ const userSchema = new Schema({
     type: String,
     required: [true, "Enter the password!"],
   },
-  address: {
-    type: String,
-  },
   role_id: {
-    type: Number,
+    type: String,
+    enum: ["consumer", "delivery", "", "admin"],
+    default: "consumer",
   },
   created_date: {
     type: Date,

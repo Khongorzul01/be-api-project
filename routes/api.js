@@ -6,21 +6,33 @@ const Category = require("../models/category");
 const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
 const { json } = require("express/lib/response");
+const CategoryController = require("../controller/CategoryController");
+const FoodController = require("../controller/FoodController");
+const UserController = require("../controller/UserController");
 
-// router.get("/users", (req, res) => {
-//   Users.find({}, function (err, data) {
-//     if (err) {
-//       throw err;
-//     } else {
-//       return res.json({
-//         data: data,
-//       });
-//     }
-//   });
-// });
+// cats
 
-router.get("/cats", (req, res) => {
-  Cats.find({}, function (err, data) {
+router.get("/categories", CategoryController.getCategories);
+router.post("/categories", CategoryController.createCats);
+router.put("/categories", CategoryController.updateCats);
+router.delete("/categories", CategoryController.deleteCats);
+
+// foods
+router.get("/foods", FoodController.getFoods);
+router.post("/foods", FoodController.createFoods);
+router.delete("/foods", FoodController.deleteFood);
+router.put("/foods", FoodController.updateFood);
+router.get("/foods/food/:id", FoodController.getFoodSearchId);
+router.get("/foods/search", FoodController.getFoodSearchName);
+
+// users
+router.get("/users", UserController.getUsers);
+router.put("/users", UserController.updateUsers);
+router.post("/users", UserController.createUsers);
+router.delete("users", UserController.deleteUsers);
+
+router.get("/foods/food/:id", (req, res) => {
+  Foods.findById({ _id: `${req.params.id}` }, function (err, data) {
     if (err) {
       throw err;
     } else {
@@ -29,61 +41,23 @@ router.get("/cats", (req, res) => {
   });
 });
 
-// router.delete("/users", (req, res) => {
-//   const reqBody = req.body;
-//   console.log(reqBody);
-//   let usersName = {
-//     name: "Hongorzul",
-//   };
-//   Users.findOneAndDelete({ name: req.body.name }, usersName, (err, data) => {
-//     if (err) {
-//       throw err;
-//     } else {
-//       res.send("delete");
-//     }
-//   });
-// });
-
-// router.put("/users", (req, res) => {
-//   const reqBody = req.body;
-//   console.log(reqBody);
-//   let updateUser = {
-//     email: req.body.email,
-//     phone: req.body.phone,
-//     password: req.body.password,
-//   };
-//   Users.findOneAndUpdate({ name: req.body.name }, updateUser, (err, data) => {
-//     if (err) {
-//       throw err;
-//     } else {
-//       res.send("update yes");
-//     }
-//   });
-// });
-
-router.post("/cats", (req, res, next) => {
-  const reqBody = req.body;
-  console.log(reqBody.name);
-  let newCats = new Cats({
-    _id: new mongoose.Types.ObjectId(),
-    name: req.body.name,
-    color: req.body.color,
+router.get("/foods/search", (req, res) => {
+  Foods.find({ name: { $regex: `${req.query.name}` } }, function (err, data) {
+    if (err) {
+      throw err;
+    } else {
+      return res.json({ data: data });
+    }
   });
-  newCats
-    .save()
-    .then((data) => {
-      res.status(201).json({
-        message: "Success",
-        data: data,
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({
-        message: "error",
-        data: err,
-      });
-    });
+});
+router.get("/cats/search", (req, res) => {
+  Foods.find({ name: { $regex: `${req.query.name}` } }, function (err, data) {
+    if (err) {
+      throw err;
+    } else {
+      return res.json({ data: data });
+    }
+  });
 });
 
 router.get("/foods", (req, res) => {
@@ -94,47 +68,6 @@ router.get("/foods", (req, res) => {
       return res.json({ data: data });
     }
   });
-});
-
-router.post("/foods", async (req, res, next) => {
-  const reqBody = req.body;
-  //   console.log(reqBody.category_id);
-  const category = await Category.findById(ObjectId(reqBody.category_id));
-  //   console.log(reqBody.name);
-  console.log(category);
-  if (category) {
-    console.log(category);
-    let newFoods = new Foods({
-      _id: new mongoose.Types.ObjectId(),
-      sales: req.body.sales,
-      name: req.body.name,
-      price: req.body.price,
-      portion: req.body.portion,
-      stock: req.body.stock,
-      image: req.body.image,
-      tumb_img: req.body.tumb_img,
-      ingredients: req.body.ingredients,
-      discount: req.body.discount,
-      category: category,
-    });
-    newFoods
-      .save()
-      .then((data) => {
-        // res.status(201).json({
-        //   message: "Success",
-        //   data: data,
-        // });
-      })
-      .catch((err) => {
-        console.log(err);
-        // res.status(500).json({
-        //   message: "error",
-        //   data: err,
-        // });
-      });
-
-    res.send("success");
-  }
 });
 
 module.exports = router;
