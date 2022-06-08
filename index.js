@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const bodyParser = require("body-parser");
+var cors = require("cors");
 const apiRoutes = require("./routes/api.js");
 require("dotenv").config();
 
@@ -17,7 +18,18 @@ mongoose.Promise = global.Promise;
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use("/api", apiRoutes);
+app.use(cors());
+// app.use("/api", apiRoutes);
+
+app.use("/api", apiRoutes, (res, req, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.header("Content-Type", "application/json");
+  next();
+});
 
 app.listen(process.env.PORT, () => {
   console.log("Application is started on PORT = " + process.env.PORT);
