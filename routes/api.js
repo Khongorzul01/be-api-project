@@ -9,6 +9,7 @@ const { json } = require("express/lib/response");
 const CategoryController = require("../controller/CategoryController");
 const FoodController = require("../controller/FoodController");
 const UserController = require("../controller/UserController");
+const AuthController = require("../controller/AuthController");
 
 // cats
 
@@ -30,6 +31,11 @@ router.get("/users", UserController.getUsers);
 router.put("/users", UserController.updateUsers);
 router.post("/users", UserController.createUsers);
 router.delete("users", UserController.deleteUsers);
+
+// auth
+
+router.post("/users/register", AuthController.register);
+router.post("/users/login", AuthController.login);
 
 router.get("/foods/food/:id", (req, res) => {
   Foods.findById({ _id: `${req.params.id}` }, function (err, data) {
