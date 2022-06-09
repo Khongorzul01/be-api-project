@@ -42,7 +42,7 @@ const foodSchema = new Schema({
     type: Number,
   },
   category: {
-    type: String,
+    type: Schema.Types.ObjectId,
     ref: "category",
   },
 });

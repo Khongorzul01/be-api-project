@@ -5,6 +5,7 @@ const Category = require("../models/category");
 const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
 const { json } = require("express/lib/response");
+const { contentDisposition } = require("express/lib/utils");
 
 const getFoodSearchId = (req, res, next) => {
   Foods.findById({ _id: `${req.params.id}` }, function (err, data) {
@@ -30,16 +31,48 @@ const getFoodSearchName = (req, res, next) => {
 // router.get("/foods/search", (req, res) => {});
 
 const getFoods = async (req, res, next) => {
-  Foods.find({}, function (err, data) {
-    if (err) {
-      next;
-    } else {
-      return res.json({
-        data: data,
-      });
-    }
+  const foods = await Foods.find({});
+
+  const categories = foods.map(async (item) => {
+    const category = await Category.findOne({ _id: item.category });
+
+    return {
+      item: item,
+      category: category,
+    };
   });
+
+  const response = await Promise.all(categories).then((values) => {
+    return values;
+  });
+  if (response) {
+    return res.json({
+      success: true,
+      message: "success",
+      data: response,
+    });
+  } else {
+    return res.json({
+      success: false,
+      message: "error",
+    });
+  }
 };
+
+// const getFoods = async (req, res, next) => {
+//   Foods.find()
+//     .populate("category")
+//     .exec(function (err, foods) {
+//       console.log(foods);
+//       res.json({
+//         data: "success",
+//       });
+//       // const test = foods.filter(function (food) {
+//       //   console.log(food.category);
+
+//       // });
+//     });
+// };
 
 const createFoods = async (req, res, next) => {
   const reqBody = req.body;

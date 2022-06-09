@@ -1,11 +1,25 @@
-const Users = require("../models/Users");
+const jwt = require("jsonwebtoken");
+const config = process.env;
 
-const register = async (req, res, next) => {
-  const data = req.body;
-  const oldUser = await Users.findOne({ email: data.email });
-  if (oldUser) {
-    return res
-      .status(400)
-      .json({ success: false, status: "Та аль хэдийн бүртгүүлсэн байна" });
+const verifyToken = (req, res, next) => {
+  const token =
+    req.body.token || req.query.token || req.headers["x-access-token"];
+  if (!token) {
+    return res.status(403).json({
+      success: false,
+      message: "Хэрэглэгчийн токен оруулах шаардлагатай.",
+    });
   }
+  try {
+    const decoded = jwt.verify(token, config.TOKEN_KEY);
+    req.user = decoded;
+  } catch (err) {
+    return res.status(401).json({
+      success: false,
+      message: "Хэрэглэгчийн токен буруу, эсвэл идэвхгүй байна.",
+    });
+  }
+  return next();
 };
+
+module.exports = verifyToken;

@@ -10,6 +10,7 @@ const CategoryController = require("../controller/CategoryController");
 const FoodController = require("../controller/FoodController");
 const UserController = require("../controller/UserController");
 const AuthController = require("../controller/AuthController");
+const auth = require("../middleware/authentication");
 
 // cats
 
@@ -27,10 +28,10 @@ router.get("/foods/food/:id", FoodController.getFoodSearchId);
 router.get("/foods/search", FoodController.getFoodSearchName);
 
 // users
-router.get("/users", UserController.getUsers);
-router.put("/users", UserController.updateUsers);
-router.post("/users", UserController.createUsers);
-router.delete("users", UserController.deleteUsers);
+router.get("/users", auth, UserController.getUsers);
+router.put("/users", auth, UserController.updateUsers);
+router.post("/users", auth, UserController.createUsers);
+router.delete("users", auth, UserController.deleteUsers);
 
 // auth
 
